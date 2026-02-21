@@ -51,13 +51,40 @@ function captureCameraFrame(sendMedia) {
   }
 }
 
-export async function startScreenCapture(sendMedia) {
+/**
+ * Get screen stream: prefer Electron desktopCapturer (no permission dialog), else getDisplayMedia.
+ * getScreenSourceId: async () => string | null - from electronAPI.getScreenSourceId
+ */
+export async function startScreenCapture(sendMedia, getScreenSourceId) {
   if (screenInterval) return;
   try {
-    screenStream = await navigator.mediaDevices.getDisplayMedia({
-      video: { frameRate: { ideal: SCREEN_FPS } },
-      audio: false,
-    });
+    let stream = null;
+    if (typeof getScreenSourceId === 'function') {
+      try {
+        const sourceId = await getScreenSourceId();
+        if (sourceId) {
+          stream = await navigator.mediaDevices.getUserMedia({
+            audio: false,
+            video: {
+              mandatory: {
+                chromeMediaSource: 'desktop',
+                chromeMediaSourceId: sourceId,
+              },
+            },
+          });
+        }
+      } catch (desktopErr) {
+        console.warn('Desktop capture via Electron failed, falling back:', desktopErr);
+      }
+    }
+    if (!stream) {
+      stream = await navigator.mediaDevices.getDisplayMedia({
+        video: { frameRate: { ideal: SCREEN_FPS } },
+        audio: false,
+      });
+    }
+    if (!stream) return;
+    screenStream = stream;
   } catch (e) {
     console.warn('Screen capture not available:', e);
     return;

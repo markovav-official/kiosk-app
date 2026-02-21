@@ -1,4 +1,4 @@
-const { app, BrowserWindow, ipcMain, globalShortcut } = require('electron');
+const { app, BrowserWindow, ipcMain, globalShortcut, desktopCapturer } = require('electron');
 const path = require('path');
 const fs = require('fs');
 
@@ -187,6 +187,19 @@ ipcMain.on('shutdown', () => {
 
 ipcMain.on('save-group-id', (_, groupId) => {
   saveConfigUpdate({ groupId: groupId || '' });
+});
+
+ipcMain.handle('get-screen-source-id', async () => {
+  try {
+    const sources = await desktopCapturer.getSources({
+      types: ['screen'],
+      thumbnailSize: { width: 1, height: 1 },
+    });
+    return sources[0]?.id ?? null;
+  } catch (e) {
+    console.error('desktopCapturer error:', e);
+    return null;
+  }
 });
 
 ipcMain.on('unlock-password', (event, password) => {

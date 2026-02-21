@@ -26,16 +26,14 @@ function reportCurrentUrl(url) {
 }
 
 function onOpenUrl(url) {
-  waitingEl.classList.add('hidden');
-  browserContainer.classList.add('visible');
+  document.body.classList.add('browser-active');
   webview.src = url;
   reportCurrentUrl(url);
 }
 
 function onCloseSite() {
   webview.src = 'about:blank';
-  browserContainer.classList.remove('visible');
-  waitingEl.classList.remove('hidden');
+  document.body.classList.remove('browser-active');
   reportCurrentUrl(null);
 }
 
@@ -67,7 +65,8 @@ function initWs() {
         group_id: config.groupId || null,
         device_id: config.deviceId || null,
       });
-      startScreenCapture(sendMedia).catch(() => {});
+      const getScreenSourceId = window.electronAPI?.getScreenSourceId ?? null;
+      startScreenCapture(sendMedia, getScreenSourceId).catch(() => {});
       startCameraCapture(sendMedia).catch(() => {});
       startAudioCapture(sendMedia).catch(() => {});
     },

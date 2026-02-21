@@ -7,36 +7,54 @@
   <title>Kiosk Client</title>
   <style>
     * { box-sizing: border-box; }
-    html, body { margin: 0; padding: 0; width: 100%; height: 100%; overflow: hidden; }
-    body { font-family: system-ui, sans-serif; background: #0a0a0f; color: #e0e0e0; }
-
-    /* Waiting: full viewport, dark, centered */
-    #waiting {
+    html, body {
+      margin: 0;
+      padding: 0;
+      width: 100%;
+      height: 100%;
+      overflow: hidden;
       position: fixed;
       inset: 0;
+    }
+    body { font-family: system-ui, sans-serif; background: #0a0a0f; color: #e0e0e0; }
+
+    /* Waiting screen: full viewport, dark, only when .waiting-active on body */
+    #waiting {
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      width: 100vw;
+      height: 100vh;
       display: flex;
       flex-direction: column;
       align-items: center;
       justify-content: center;
-      background: linear-gradient(180deg, #0a0a0f 0%, #12121a 100%);
+      background: linear-gradient(180deg, #050508 0%, #0c0c12 50%, #08080d 100%);
       text-align: center;
       padding: 2rem;
+      z-index: 1;
     }
-    #waiting.hidden { display: none; }
+    body.browser-active #waiting {
+      display: none !important;
+      visibility: hidden;
+      pointer-events: none;
+    }
 
-    #waiting .title { font-size: 1.25rem; font-weight: 600; color: #71717a; margin-bottom: 2rem; }
-    #waiting .status-line { font-size: 0.95rem; margin-top: 1rem; }
+    #waiting .title { font-size: 1rem; font-weight: 600; color: #52525b; margin-bottom: 1.5rem; letter-spacing: 0.05em; }
+    #waiting .status-line { font-size: 0.9rem; margin-top: 0.5rem; }
     #waiting .status-line.connected { color: #22c55e; }
     #waiting .status-line.disconnected { color: #94a3b8; }
 
     .waiting-dots {
       display: inline-flex;
-      gap: 6px;
-      margin-top: 1.5rem;
+      gap: 8px;
+      margin-top: 2rem;
     }
     .waiting-dots span {
-      width: 8px;
-      height: 8px;
+      width: 10px;
+      height: 10px;
       border-radius: 50%;
       background: #3f3f46;
       animation: waiting-bounce 1.4s ease-in-out infinite both;
@@ -48,30 +66,42 @@
       40% { transform: scale(1); opacity: 1; }
     }
 
-    /* Browser: only webview, full screen, no chrome */
+    /* Browser: единственный контент при открытом сайте — webview на весь экран */
     #browser-container {
       display: none;
       position: fixed;
-      inset: 0;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
       width: 100vw;
       height: 100vh;
+      margin: 0;
+      padding: 0;
       background: #000;
+      z-index: 2;
     }
-    #browser-container.visible {
-      display: block;
+    body.browser-active #browser-container {
+      display: block !important;
     }
     #browser-container webview {
-      display: block;
-      width: 100%;
-      height: 100%;
-      border: none;
+      position: absolute !important;
+      top: 0 !important;
+      left: 0 !important;
+      right: 0 !important;
+      bottom: 0 !important;
+      width: 100% !important;
+      height: 100% !important;
+      margin: 0 !important;
+      padding: 0 !important;
+      border: none !important;
     }
   </style>
 </head>
 <body>
   <div id="waiting">
     <div class="title">Kiosk Client</div>
-    <p class="status-line disconnected" id="status">Подключение к серверу…</p>
+    <p class="status-line disconnected" id="status">Ожидание ответа от сервера…</p>
     <div class="waiting-dots" aria-hidden="true">
       <span></span><span></span><span></span>
     </div>

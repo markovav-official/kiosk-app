@@ -7,5 +7,6 @@ contextBridge.exposeInMainWorld('electronAPI', {
   quitApp: () => ipcRenderer.send('quit-app'),
   shutdown: () => ipcRenderer.send('shutdown'),
   saveGroupId: (groupId) => ipcRenderer.send('save-group-id', groupId),
+  getScreenSourceId: () => ipcRenderer.invoke('get-screen-source-id'),
   platform: process.platform,
 });
