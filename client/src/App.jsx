@@ -1,6 +1,6 @@
 import { useCallback, useEffect, useRef, useState } from 'react';
 import { createWsClient } from '../js/websocket.js';
-import { startScreenCapture, startCameraCapture, startAudioCapture } from '../js/capture.js';
+import { startScreenCapture, startCameraCapture, startAudioCapture, stopAllCapture } from '../js/capture.js';
 import { handleCommand } from '../js/commands.js';
 import { WaitingScreen } from './WaitingScreen.jsx';
 import { BrowserView } from './BrowserView.jsx';
@@ -96,7 +96,10 @@ function App() {
           onSetGroup,
         });
       },
-      onClose: () => setConnected(false),
+      onClose: () => {
+        stopAllCapture();
+        setConnected(false);
+      },
       onError: () => setConnected(false),
     });
     wsClientRef.current = client;

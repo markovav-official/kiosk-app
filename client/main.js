@@ -95,6 +95,18 @@ function createWindow() {
     mainWindow.webContents.send('config', config);
   });
 
+  // Блокировка F11 и выхода из полноэкранного режима без разблокировки
+  mainWindow.webContents.on('before-input-event', (event, input) => {
+    if (isLocked && input.key === 'F11') {
+      event.preventDefault();
+    }
+  });
+  mainWindow.on('leave-full-screen', () => {
+    if (isLocked && mainWindow && !mainWindow.isDestroyed()) {
+      mainWindow.setFullScreen(true);
+    }
+  });
+
   mainWindow.on('close', (e) => {
     if (!allowClose) {
       e.preventDefault();
