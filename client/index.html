@@ -1,105 +1,13 @@
 <!DOCTYPE html>
 <html lang="ru">
-<head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <meta http-equiv="Content-Security-Policy" content="default-src 'self' https: http: data: blob:; script-src 'self' 'unsafe-inline'; media-src * blob:; connect-src 'self' ws: wss:;">
-  <title>Kiosk Client</title>
-  <style>
-    * { box-sizing: border-box; }
-    html {
-      margin: 0;
-      padding: 0;
-      width: 100%;
-      height: 100%;
-      background: #0b0b0f !important;
-    }
-    body {
-      margin: 0;
-      padding: 0;
-      width: 100%;
-      height: 100%;
-      overflow: hidden;
-      font-family: system-ui, sans-serif;
-      background: #0b0b0f !important;
-      color: #e0e0e0;
-    }
-
-    /* Экран ожидания — тёмный, по центру */
-    #waiting {
-      position: fixed;
-      inset: 0;
-      width: 100%;
-      height: 100%;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      justify-content: center;
-      background: #0b0b0f !important;
-      background-image: linear-gradient(180deg, #060609 0%, #0d0d14 100%) !important;
-      text-align: center;
-      padding: 2rem;
-      z-index: 10;
-    }
-    #waiting .title { font-size: 0.95rem; font-weight: 600; color: #52525b; margin-bottom: 1.5rem; letter-spacing: 0.08em; }
-    #waiting .status-line { font-size: 0.9rem; margin-top: 0.5rem; }
-    #waiting .status-line.connected { color: #22c55e; }
-    #waiting .status-line.disconnected { color: #94a3b8; }
-    .waiting-dots { display: inline-flex; gap: 8px; margin-top: 2rem; }
-    .waiting-dots span {
-      width: 10px; height: 10px; border-radius: 50%;
-      background: #3f3f46;
-      animation: dot 1.4s ease-in-out infinite both;
-    }
-    .waiting-dots span:nth-child(1) { animation-delay: -0.32s; }
-    .waiting-dots span:nth-child(2) { animation-delay: -0.16s; }
-    @keyframes dot {
-      0%, 80%, 100% { transform: scale(0.6); opacity: 0.5; }
-      40% { transform: scale(1); opacity: 1; }
-    }
-
-    /* Контейнер сайта — изначально скрыт, показывается только из JS */
-    #browser-container {
-      display: none;
-      position: fixed;
-      top: 0;
-      left: 0;
-      width: 100%;
-      height: 100%;
-      margin: 0;
-      padding: 0;
-      background: #000;
-      z-index: 5;
-    }
-    #browser-container webview {
-      position: absolute;
-      top: 0;
-      left: 0;
-      width: 100%;
-      height: 100%;
-      margin: 0;
-      padding: 0;
-      border: none;
-    }
-  </style>
-</head>
-<body style="background:#0b0b0f !important;">
-  <div id="waiting" style="background:#0b0b0f !important;">
-    <div class="title">Kiosk Client</div>
-    <p class="status-line disconnected" id="status">Ожидание ответа от сервера…</p>
-    <div class="waiting-dots" aria-hidden="true"><span></span><span></span><span></span></div>
-  </div>
-  <div id="browser-container">
-    <webview id="webview" allowpopups="no"></webview>
-  </div>
-  <script>
-    (function() {
-      document.documentElement.style.background = '#0b0b0f';
-      document.body.style.background = '#0b0b0f';
-      var w = document.getElementById('waiting');
-      if (w) w.style.background = '#0b0b0f';
-    })();
-  </script>
-  <script type="module" src="renderer.js"></script>
-</body>
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta http-equiv="Content-Security-Policy" content="default-src 'self' https: http: data: blob:; script-src 'self' 'unsafe-inline' 'unsafe-eval'; style-src 'self' 'unsafe-inline'; media-src * blob:; connect-src 'self' ws: wss:;" />
+    <title>Kiosk Client</title>
+  </head>
+  <body>
+    <div id="root"></div>
+    <script type="module" src="/src/main.jsx"></script>
+  </body>
 </html>

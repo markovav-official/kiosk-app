@@ -86,7 +86,10 @@ function createWindow() {
   });
 
   mainWindow.setMenuBarVisibility(false);
-  mainWindow.loadFile(path.join(__dirname, 'index.html'));
+  const indexPath = fs.existsSync(path.join(__dirname, 'dist', 'index.html'))
+    ? path.join(__dirname, 'dist', 'index.html')
+    : path.join(__dirname, 'index.html');
+  mainWindow.loadFile(indexPath);
 
   mainWindow.webContents.on('did-finish-load', () => {
     mainWindow.webContents.send('config', config);

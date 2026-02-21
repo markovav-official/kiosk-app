@@ -1,48 +1,49 @@
 {
-    "name": "kiosk-app",
-    "version": "1.0.0",
-    "description": "Electron kiosk application with portable Windows build",
-    "main": "main.js",
-    "scripts": {
-        "start": "electron .",
-        "build": "electron-builder",
-        "build:win": "electron-builder --win portable",
-        "build:win:dir": "electron-builder --win portable --dir"
+  "name": "kiosk-app",
+  "version": "1.0.0",
+  "description": "Electron kiosk application with portable Windows build",
+  "main": "main.js",
+  "type": "module",
+  "scripts": {
+    "dev": "vite",
+    "build": "vite build",
+    "start": "npm run build && electron .",
+    "start:dev": "vite build --watch & electron .",
+    "build:win": "npm run build && electron-builder --win portable",
+    "build:win:dir": "npm run build && electron-builder --win portable --dir"
+  },
+  "author": "",
+  "license": "MIT",
+  "dependencies": {
+    "react": "^19.2.0",
+    "react-dom": "^19.2.0"
+  },
+  "devDependencies": {
+    "@tailwindcss/vite": "^4.2.0",
+    "@vitejs/plugin-react": "^5.1.1",
+    "electron": "^40.6.0",
+    "electron-builder": "^26.8.0",
+    "tailwindcss": "^4.2.0",
+    "vite": "^7.3.1"
+  },
+  "build": {
+    "appId": "com.kiosk.app",
+    "productName": "Kiosk App",
+    "directories": { "output": "dist-app" },
+    "files": [
+      "main.js",
+      "preload.js",
+      "dist/**",
+      "unlock.html",
+      "unlock-preload.js",
+      "js/**/*",
+      "config.json"
+    ],
+    "win": {
+      "target": [{ "target": "portable", "arch": ["x64"] }]
     },
-    "author": "",
-    "license": "MIT",
-    "devDependencies": {
-        "electron": "^40.6.0",
-        "electron-builder": "^26.8.0"
-    },
-    "build": {
-        "appId": "com.kiosk.app",
-        "productName": "Kiosk App",
-        "directories": {
-            "output": "dist"
-        },
-        "files": [
-            "main.js",
-            "preload.js",
-            "index.html",
-            "renderer.js",
-            "unlock.html",
-            "unlock-preload.js",
-            "js/**/*",
-            "config.json"
-        ],
-        "win": {
-            "target": [
-                {
-                    "target": "portable",
-                    "arch": [
-                        "x64"
-                    ]
-                }
-            ]
-        },
-        "portable": {
-            "artifactName": "${productName}-${version}-portable.${ext}"
-        }
+    "portable": {
+      "artifactName": "${productName}-${version}-portable.${ext}"
     }
+  }
 }
