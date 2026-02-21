@@ -2,7 +2,6 @@ const { app, BrowserWindow, ipcMain, globalShortcut } = require('electron');
 const path = require('path');
 const fs = require('fs');
 
-// Load config: .env-style from config.json (or env vars for dev)
 function loadConfig() {
   const configPath = path.join(app.getAppPath(), 'config.json');
   let data = {};
@@ -19,12 +18,53 @@ function loadConfig() {
     groupId: process.env.GROUP_ID || data.groupId || '',
     unlockPassword: process.env.UNLOCK_PASSWORD || data.unlockPassword || '',
     unlockShortcut: process.env.UNLOCK_SHORTCUT || data.unlockShortcut || 'CommandOrControl+Alt+L',
+    deviceId: getDeviceId(),
   };
+}
+
+function getDeviceId() {
+  const crypto = require('crypto');
+  const storePath = path.join(app.getPath('userData'), 'device_id.json');
+  try {
+    if (fs.existsSync(storePath)) {
+      const data = JSON.parse(fs.readFileSync(storePath, 'utf8'));
+      if (data.deviceId) return data.deviceId;
+    }
+  } catch (e) {
+    console.error('device_id read error:', e);
+  }
+  const deviceId = crypto.randomUUID ? crypto.randomUUID() : crypto.randomBytes(16).toString('hex');
+  try {
+    fs.writeFileSync(storePath, JSON.stringify({ deviceId }, null, 0));
+  } catch (e) {
+    console.error('device_id write error:', e);
+  }
+  return deviceId;
+}
+
+function saveConfigUpdate(updates) {
+  const configPath = path.join(app.getAppPath(), 'config.json');
+  let data = {};
+  try {
+    if (fs.existsSync(configPath)) {
+      data = JSON.parse(fs.readFileSync(configPath, 'utf8'));
+    }
+  } catch (e) {
+    console.error('Config read error:', e);
+  }
+  Object.assign(data, updates);
+  try {
+    fs.writeFileSync(configPath, JSON.stringify(data, null, 2));
+  } catch (e) {
+    console.error('Config write error:', e);
+  }
 }
 
 let mainWindow = null;
 let unlockWindow = null;
 let isLocked = true;
+/** Only when true will app/window close (e.g. after "quit" from monitor). */
+let allowClose = false;
 
 function createWindow() {
   const config = loadConfig();
@@ -52,6 +92,12 @@ function createWindow() {
     mainWindow.webContents.send('config', config);
   });
 
+  mainWindow.on('close', (e) => {
+    if (!allowClose) {
+      e.preventDefault();
+    }
+  });
+
   if (process.env.NODE_ENV === 'development') {
     mainWindow.webContents.openDevTools();
   }
@@ -63,8 +109,8 @@ function showUnlockWindow(config) {
     return;
   }
   unlockWindow = new BrowserWindow({
-    width: 340,
-    height: 220,
+    width: 420,
+    height: 320,
     modal: true,
     parent: mainWindow,
     frame: true,
@@ -121,10 +167,12 @@ function registerUnlockShortcut(config) {
 }
 
 ipcMain.on('quit-app', () => {
+  allowClose = true;
   app.quit();
 });
 
 ipcMain.on('shutdown', () => {
+  allowClose = true;
   const { exec } = require('child_process');
   const cmd = process.platform === 'win32'
     ? 'shutdown /s /t 5'
@@ -135,6 +183,10 @@ ipcMain.on('shutdown', () => {
     if (err) console.error('Shutdown error:', err);
   });
   app.quit();
+});
+
+ipcMain.on('save-group-id', (_, groupId) => {
+  saveConfigUpdate({ groupId: groupId || '' });
 });
 
 ipcMain.on('unlock-password', (event, password) => {
@@ -151,8 +203,15 @@ app.whenReady().then(() => {
   registerUnlockShortcut(config);
 });
 
+app.on('before-quit', (e) => {
+  if (!allowClose) {
+    e.preventDefault();
+  }
+});
+
 app.on('window-all-closed', () => {
   globalShortcut.unregisterAll();
+  if (!allowClose) return;
   app.quit();
 });
 

@@ -75,9 +75,14 @@ export async function startScreenCapture(sendMedia) {
     screenCanvas.height = Math.min(screenVideo.videoHeight, 540);
   };
 
-  screenInterval = setInterval(() => {
-    captureScreenFrame(sendMedia);
-  }, 1000 / SCREEN_FPS);
+  const startScreenInterval = () => {
+    if (screenInterval) return;
+    screenInterval = setInterval(() => {
+      captureScreenFrame(sendMedia);
+    }, 1000 / SCREEN_FPS);
+  };
+  screenVideo.onloadeddata = startScreenInterval;
+  if (screenVideo.readyState >= 2) startScreenInterval();
 }
 
 export async function startCameraCapture(sendMedia) {

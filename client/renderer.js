@@ -65,6 +65,7 @@ function initWs() {
         type: 'register',
         hostname: navigator.platform || 'kiosk',
         group_id: config.groupId || null,
+        device_id: config.deviceId || null,
       });
       startScreenCapture(sendMedia).catch(() => {});
       startCameraCapture(sendMedia).catch(() => {});
@@ -75,7 +76,13 @@ function initWs() {
         wsClient.send({ type: 'pong' });
         return;
       }
-      handleCommand(data, { onOpenUrl, onCloseSite, onCloseApp, onShutdown });
+      function onSetGroup(groupId) {
+        if (config) config.groupId = groupId || '';
+        if (window.electronAPI && window.electronAPI.saveGroupId) {
+          window.electronAPI.saveGroupId(groupId || '');
+        }
+      }
+      handleCommand(data, { onOpenUrl, onCloseSite, onCloseApp, onShutdown, onSetGroup });
     },
     onClose: () => setStatus(false),
     onError: () => setStatus(false),

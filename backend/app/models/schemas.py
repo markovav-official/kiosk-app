@@ -9,6 +9,7 @@ class ClientRegister(BaseModel):
     type: Literal["register"] = "register"
     hostname: str = ""
     group_id: str | None = None  # optional group to join
+    device_id: str | None = None  # persistent device UUID for reattach on reconnect
 
 
 class ClientMediaFrame(BaseModel):
@@ -55,11 +56,14 @@ class ServerPing(BaseModel):
 class ClientInfo(BaseModel):
     """Client device info for monitor."""
     client_id: str
+    device_id: str | None
     hostname: str
+    display_name: str | None  # override name from monitor
     group_id: str | None
     current_url: str | None
     connected_at: str
     last_seen: str
+    connected: bool
 
 
 class GroupInfo(BaseModel):

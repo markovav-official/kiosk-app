@@ -31,4 +31,6 @@ export const api = {
   groupCloseSite: (groupId) => request(`/api/groups/${groupId}/close_site`, { method: 'POST' }),
   groupCloseApp: (groupId) => request(`/api/groups/${groupId}/close_app`, { method: 'POST' }),
   groupShutdown: (groupId) => request(`/api/groups/${groupId}/shutdown`, { method: 'POST' }),
+  updateClient: (clientId, body) =>
+    request(`/api/clients/${clientId}`, { method: 'PATCH', body: JSON.stringify(body) }),
 }

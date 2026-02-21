@@ -62,14 +62,13 @@ async def websocket_client(
         manager.remove_client(websocket)
         client_id = manager.registry.unregister_by_ws_id(ws_id)
         if client_id:
-            manager.groups.remove_client(client_id)
             await manager.broadcast_to_monitors({
-                "type": "client_left",
+                "type": "client_disconnected",
                 "payload": {"client_id": client_id},
             })
             await manager.broadcast_to_monitors({
                 "type": "clients_list",
-                "payload": {"clients": [c.model_dump() for c in manager.registry.list_all()]},
+                "payload": {"clients": [c.to_info().model_dump() for c in manager.registry._clients.values()]},
             })
             await manager.broadcast_to_monitors({
                 "type": "groups_list",
@@ -92,12 +91,21 @@ async def websocket_monitor(
     try:
         await websocket.send_json({
             "type": "clients_list",
-            "payload": {"clients": [c.model_dump() for c in manager.registry.list_all()]},
+            "payload": {"clients": [c.to_info().model_dump() for c in manager.registry._clients.values()]},
         })
         await websocket.send_json({
             "type": "groups_list",
             "payload": {"groups": [{"group_id": g.group_id, "name": g.name, "client_ids": g.client_ids} for g in manager.groups.list_all()]},
         })
+        for c in manager.registry._clients.values():
+            media = manager.registry.get_media(c.client_id)
+            for kind in ("screen", "camera"):
+                data_b64 = media.get(kind)
+                if data_b64:
+                    await websocket.send_json({
+                        "type": "media",
+                        "payload": {"client_id": c.client_id, "kind": kind, "data": data_b64, "mime": "image/jpeg"},
+                    })
         while True:
             await websocket.receive_text()
     except WebSocketDisconnect:

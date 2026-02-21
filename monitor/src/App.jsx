@@ -3,6 +3,7 @@ import { useWebSocket } from './hooks/useWebSocket'
 import { GroupSidebar } from './components/GroupSidebar'
 import { GroupPanel } from './components/GroupPanel'
 import { DeviceCard } from './components/DeviceCard'
+import { DeviceDetailView } from './components/DeviceDetailView'
 import { api } from './api/client'
 
 function App() {
@@ -10,6 +11,7 @@ function App() {
   const [groups, setGroups] = useState([])
   const [media, setMedia] = useState({}) // client_id -> { screen, camera, audio }
   const [selectedGroupId, setSelectedGroupId] = useState(null)
+  const [selectedClientId, setSelectedClientId] = useState(null)
 
   const refresh = useCallback(async () => {
     try {
@@ -47,6 +49,13 @@ function App() {
         )
       )
     }
+    if (msg.type === 'client_disconnected' && msg.payload?.client_id) {
+      setClients((prev) =>
+        prev.map((c) =>
+          c.client_id === msg.payload.client_id ? { ...c, connected: false } : c
+        )
+      )
+    }
   }, [])
 
   useWebSocket(onWsMessage)
@@ -63,6 +72,20 @@ function App() {
     : clients
 
   const selectedGroup = groups.find((g) => g.group_id === selectedGroupId)
+  const selectedClient = selectedClientId
+    ? clients.find((c) => c.client_id === selectedClientId)
+    : null
+
+  if (selectedClient && selectedClientId) {
+    return (
+      <DeviceDetailView
+        client={selectedClient}
+        media={media[selectedClientId]}
+        onBack={() => setSelectedClientId(null)}
+        onRefresh={refresh}
+      />
+    )
+  }
 
   return (
     <div className="min-h-screen bg-slate-950 text-slate-200 flex">
@@ -94,7 +117,9 @@ function App() {
               key={client.client_id}
               client={client}
               media={media[client.client_id]}
+              groups={groups}
               onRefresh={refresh}
+              onOpenDetail={(c) => setSelectedClientId(c.client_id)}
             />
           ))}
         </div>

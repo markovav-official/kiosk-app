@@ -26,19 +26,28 @@ async def handle_client_message(
             data = json.loads(raw)
             if data.get("type") == "register":
                 reg = ClientRegister(**{k: v for k, v in data.items() if k in ClientRegister.model_fields})
-                client_id = registry.register(ws_id, reg.hostname, reg.group_id)
+                client_id = registry.register(
+                    ws_id, reg.hostname, reg.group_id, reg.device_id
+                )
                 if reg.group_id:
                     groups.add_client(reg.group_id, client_id)
+                # If reattached, ensure group membership is updated
+                c = registry.get(client_id)
+                if c and c.group_id:
+                    groups.add_client(c.group_id, client_id)
                 registry.touch(client_id)
                 await manager.broadcast_to_monitors({
                     "type": "clients_list",
                     "payload": {"clients": [c.to_info().model_dump() for c in registry._clients.values()]},
                 })
                 await manager.broadcast_to_monitors({
+                    "type": "client_joined",
+                    "payload": {"client_id": client_id},
+                })
+                await manager.broadcast_to_monitors({
                     "type": "groups_list",
                     "payload": {"groups": [{"group_id": g.group_id, "name": g.name, "client_ids": g.client_ids} for g in groups.list_all()]},
                 })
-                await manager.broadcast_to_monitors({"type": "client_joined", "payload": {"client_id": client_id}})
             return
         except Exception as e:
             logger.warning("Client register parse error: %s", e)
