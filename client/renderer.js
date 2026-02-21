@@ -26,14 +26,34 @@ function reportCurrentUrl(url) {
 }
 
 function onOpenUrl(url) {
-  document.body.classList.add('browser-active');
+  waitingEl.style.display = 'none';
+  waitingEl.style.visibility = 'hidden';
+  browserContainer.style.display = 'block';
+  browserContainer.style.visibility = 'visible';
+  browserContainer.style.position = 'fixed';
+  browserContainer.style.top = '0';
+  browserContainer.style.left = '0';
+  browserContainer.style.width = '100vw';
+  browserContainer.style.height = '100vh';
+  browserContainer.style.zIndex = '9999';
+  webview.style.position = 'fixed';
+  webview.style.top = '0';
+  webview.style.left = '0';
+  webview.style.width = '100vw';
+  webview.style.height = '100vh';
+  webview.style.margin = '0';
+  webview.style.padding = '0';
+  webview.style.border = 'none';
   webview.src = url;
   reportCurrentUrl(url);
 }
 
 function onCloseSite() {
   webview.src = 'about:blank';
-  document.body.classList.remove('browser-active');
+  browserContainer.style.display = 'none';
+  browserContainer.style.visibility = 'hidden';
+  waitingEl.style.display = 'flex';
+  waitingEl.style.visibility = 'visible';
   reportCurrentUrl(null);
 }
 
