@@ -1,17 +1,28 @@
-import { useState } from 'react'
+import { useState, useRef, useEffect } from 'react'
 import { api } from '../api/client'
 
 export function DeviceCard({ client, media, groups, onRefresh, onOpenDetail }) {
   const [url, setUrl] = useState('')
   const [loading, setLoading] = useState(null)
+  const [menuOpen, setMenuOpen] = useState(false)
   const [editing, setEditing] = useState(false)
   const [editName, setEditName] = useState(client.display_name ?? client.hostname ?? '')
   const [editGroupId, setEditGroupId] = useState(client.group_id ?? '')
+  const menuRef = useRef(null)
 
   const screenSrc = media?.screen ? `data:image/jpeg;base64,${media.screen}` : null
   const cameraSrc = media?.camera ? `data:image/jpeg;base64,${media.camera}` : null
   const displayName = client.display_name || client.hostname
   const connected = client.connected !== false
+
+  useEffect(() => {
+    if (!menuOpen) return
+    function handleClickOutside(e) {
+      if (menuRef.current && !menuRef.current.contains(e.target)) setMenuOpen(false)
+    }
+    document.addEventListener('mousedown', handleClickOutside)
+    return () => document.removeEventListener('mousedown', handleClickOutside)
+  }, [menuOpen])
 
   async function doAction(action, arg) {
     setLoading(action)
@@ -44,9 +55,16 @@ export function DeviceCard({ client, media, groups, onRefresh, onOpenDetail }) {
     }
   }
 
+  function openEditForm() {
+    setEditName(client.display_name ?? client.hostname ?? '')
+    setEditGroupId(client.group_id ?? '')
+    setEditing(true)
+  }
+
   return (
-    <div className="rounded-xl bg-slate-800/80 border border-slate-700 overflow-hidden shadow-lg">
-      <div className="p-2 border-b border-slate-700 flex items-center justify-between flex-wrap gap-2">
+    <div className="rounded-xl bg-slate-800/80 border border-slate-700 shadow-lg overflow-visible">
+      {/* Header: name + group badge + menu */}
+      <div className="p-2 border-b border-slate-700 flex items-center gap-2 overflow-visible">
         <div className="flex items-center gap-2 min-w-0 flex-1">
           <span className="font-medium text-slate-200 truncate" title={displayName}>
             {displayName}
@@ -62,46 +80,126 @@ export function DeviceCard({ client, media, groups, onRefresh, onOpenDetail }) {
             {client.group_id}
           </span>
         )}
-      </div>
-      {editing ? (
-        <div className="p-2 space-y-2 border-b border-slate-700">
-          <input
-            type="text"
-            value={editName}
-            onChange={(e) => setEditName(e.target.value)}
-            placeholder="Имя"
-            className="w-full rounded px-2 py-1 bg-slate-700 text-slate-200 text-sm border border-slate-600"
-          />
-          <select
-            value={editGroupId}
-            onChange={(e) => setEditGroupId(e.target.value)}
-            className="w-full rounded px-2 py-1 bg-slate-700 text-slate-200 text-sm border border-slate-600"
+        <div className="relative shrink-0" ref={menuRef}>
+          <button
+            type="button"
+            onClick={() => setMenuOpen((o) => !o)}
+            className="w-8 h-8 rounded-lg flex items-center justify-center text-slate-400 hover:bg-slate-700 hover:text-slate-200 transition-colors"
+            title="Действия"
+            aria-label="Меню"
           >
-            <option value="">— без группы —</option>
-            {groups?.map((g) => (
-              <option key={g.group_id} value={g.group_id}>
-                {g.name || g.group_id}
-              </option>
-            ))}
-          </select>
-          <div className="flex gap-2">
-            <button
-              onClick={saveEdit}
-              disabled={loading === 'edit'}
-              className="px-3 py-1 rounded bg-emerald-600 hover:bg-emerald-500 text-white text-sm"
-            >
-              Сохранить
-            </button>
-            <button
-              onClick={() => setEditing(false)}
-              className="px-3 py-1 rounded bg-slate-600 hover:bg-slate-500 text-white text-sm"
-            >
-              Отмена
-            </button>
-          </div>
+            <span className="text-lg leading-none font-medium">⋯</span>
+          </button>
+          {menuOpen && (
+            <div className="absolute right-0 top-full mt-1 z-[100] w-80 max-h-[70vh] overflow-y-auto rounded-lg border border-slate-600 bg-slate-800 shadow-xl p-3 space-y-3">
+              {/* Open URL */}
+              <div>
+                <label className="block text-xs text-slate-400 mb-1">Открыть URL</label>
+                <div className="flex gap-2">
+                  <input
+                    type="url"
+                    placeholder="https://..."
+                    value={url}
+                    onChange={(e) => setUrl(e.target.value)}
+                    className="flex-1 min-w-0 rounded-lg px-3 py-2 bg-slate-700 text-slate-200 text-sm border border-slate-600 placeholder-slate-500"
+                  />
+                  <button
+                    onClick={() => doAction('openUrl')}
+                    disabled={loading || !url.trim()}
+                    className="shrink-0 px-3 py-2 rounded-lg bg-emerald-600 hover:bg-emerald-500 disabled:opacity-50 text-white text-sm"
+                  >
+                    Открыть
+                  </button>
+                </div>
+              </div>
+
+              {/* Quick actions */}
+              <div className="flex flex-wrap gap-2">
+                {onOpenDetail && (
+                  <button
+                    onClick={() => {
+                      setMenuOpen(false)
+                      onOpenDetail(client)
+                    }}
+                    className="px-3 py-2 rounded-lg bg-indigo-600 hover:bg-indigo-500 text-white text-sm"
+                  >
+                    Полный экран
+                  </button>
+                )}
+                <button
+                  onClick={() => {
+                    if (!editing) openEditForm()
+                    else setEditing(false)
+                  }}
+                  className="px-3 py-2 rounded-lg bg-slate-600 hover:bg-slate-500 text-white text-sm"
+                >
+                  {editing ? 'Отмена' : 'Имя / группа'}
+                </button>
+              </div>
+
+              {/* Edit form inline */}
+              {editing && (
+                <div className="space-y-2 pt-2 border-t border-slate-600">
+                  <input
+                    type="text"
+                    value={editName}
+                    onChange={(e) => setEditName(e.target.value)}
+                    placeholder="Имя устройства"
+                    className="w-full rounded-lg px-3 py-2 bg-slate-700 text-slate-200 text-sm border border-slate-600"
+                  />
+                  <select
+                    value={editGroupId}
+                    onChange={(e) => setEditGroupId(e.target.value)}
+                    className="w-full rounded-lg px-3 py-2 bg-slate-700 text-slate-200 text-sm border border-slate-600"
+                  >
+                    <option value="">— без группы —</option>
+                    {groups?.map((g) => (
+                      <option key={g.group_id} value={g.group_id}>
+                        {g.name || g.group_id}
+                      </option>
+                    ))}
+                  </select>
+                  <button
+                    onClick={saveEdit}
+                    disabled={loading === 'edit'}
+                    className="w-full px-3 py-2 rounded-lg bg-emerald-600 hover:bg-emerald-500 disabled:opacity-50 text-white text-sm"
+                  >
+                    Сохранить
+                  </button>
+                </div>
+              )}
+
+              {/* Danger / control actions */}
+              <div className="pt-2 border-t border-slate-600 space-y-1">
+                <button
+                  onClick={() => doAction('closeSite')}
+                  disabled={loading}
+                  className="w-full px-3 py-2 rounded-lg bg-amber-600 hover:bg-amber-500 text-white text-sm text-left"
+                >
+                  Закрыть сайт
+                </button>
+                <button
+                  onClick={() => doAction('closeApp')}
+                  disabled={loading}
+                  className="w-full px-3 py-2 rounded-lg bg-red-600 hover:bg-red-500 text-white text-sm text-left"
+                >
+                  Закрыть клиент
+                </button>
+                <button
+                  onClick={() => doAction('shutdown')}
+                  disabled={loading}
+                  className="w-full px-3 py-2 rounded-lg bg-slate-600 hover:bg-slate-500 text-white text-sm text-left"
+                >
+                  Выключить ПК
+                </button>
+              </div>
+            </div>
+          )}
         </div>
-      ) : null}
-      <div className="grid grid-cols-1 sm:grid-cols-2 gap-1 p-2">
+      </div>
+
+      {/* Preview: screen + camera only */}
+      <div className="grid grid-cols-1 sm:grid-cols-2 gap-1 p-2 overflow-hidden rounded-b-xl">
         <div
           className="aspect-video bg-black rounded overflow-hidden relative cursor-pointer group"
           onClick={() => onOpenDetail?.(client)}
@@ -129,67 +227,10 @@ export function DeviceCard({ client, media, groups, onRefresh, onOpenDetail }) {
         </div>
       </div>
       {client.current_url && (
-        <div className="px-2 pb-1 text-xs text-slate-400 truncate" title={client.current_url}>
+        <div className="px-2 pb-2 text-xs text-slate-400 truncate" title={client.current_url}>
           {client.current_url}
         </div>
       )}
-      <div className="p-2 flex flex-wrap gap-2">
-        <button
-          onClick={() => {
-            if (!editing) {
-              setEditName(client.display_name ?? client.hostname ?? '')
-              setEditGroupId(client.group_id ?? '')
-            }
-            setEditing(!editing)
-          }}
-          className="px-3 py-1 rounded bg-slate-600 hover:bg-slate-500 text-white text-sm"
-        >
-          {editing ? 'Закрыть' : 'Изменить имя/группу'}
-        </button>
-        {onOpenDetail && (
-          <button
-            onClick={() => onOpenDetail(client)}
-            className="px-3 py-1 rounded bg-indigo-600 hover:bg-indigo-500 text-white text-sm"
-          >
-            Полный экран
-          </button>
-        )}
-        <input
-          type="url"
-          placeholder="URL"
-          value={url}
-          onChange={(e) => setUrl(e.target.value)}
-          className="flex-1 min-w-0 rounded px-2 py-1 bg-slate-700 text-slate-200 text-sm border border-slate-600"
-        />
-        <button
-          onClick={() => doAction('openUrl')}
-          disabled={loading || !url.trim()}
-          className="px-3 py-1 rounded bg-emerald-600 hover:bg-emerald-500 disabled:opacity-50 text-white text-sm"
-        >
-          Открыть
-        </button>
-        <button
-          onClick={() => doAction('closeSite')}
-          disabled={loading}
-          className="px-3 py-1 rounded bg-amber-600 hover:bg-amber-500 text-white text-sm"
-        >
-          Закрыть сайт
-        </button>
-        <button
-          onClick={() => doAction('closeApp')}
-          disabled={loading}
-          className="px-3 py-1 rounded bg-red-600 hover:bg-red-500 text-white text-sm"
-        >
-          Закрыть клиент
-        </button>
-        <button
-          onClick={() => doAction('shutdown')}
-          disabled={loading}
-          className="px-3 py-1 rounded bg-slate-600 hover:bg-slate-500 text-white text-sm"
-        >
-          Выключить ПК
-        </button>
-      </div>
     </div>
   )
 }

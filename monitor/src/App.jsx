@@ -81,6 +81,7 @@ function App() {
       <DeviceDetailView
         client={selectedClient}
         media={media[selectedClientId]}
+        groups={groups}
         onBack={() => setSelectedClientId(null)}
         onRefresh={refresh}
       />
@@ -93,6 +94,7 @@ function App() {
         groups={groups}
         selectedGroupId={selectedGroupId}
         onSelectGroup={setSelectedGroupId}
+        onRefresh={refresh}
       />
       <main className="flex-1 overflow-auto p-4">
         <div className="flex items-center gap-4 mb-4">

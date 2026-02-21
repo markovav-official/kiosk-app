@@ -11,8 +11,8 @@ let config = null;
 let wsClient = null;
 
 function setStatus(connected) {
-  statusEl.textContent = connected ? 'Подключено к серверу' : 'Нет соединения';
-  statusEl.className = 'status ' + (connected ? 'connected' : 'disconnected');
+  statusEl.textContent = connected ? 'Подключено к серверу' : 'Ожидание ответа от сервера…';
+  statusEl.className = 'status-line ' + (connected ? 'connected' : 'disconnected');
 }
 
 function sendMedia(kind, data, mime) {
