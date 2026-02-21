@@ -1,1 +1,48 @@
-{"name":"kiosk-app","version":"1.0.0","description":"Electron kiosk application with portable Windows build","main":"main.js","scripts":{"start":"electron .","build":"electron-builder","build:win":"electron-builder --win portable","build:win:dir":"electron-builder --win portable --dir"},"author":"","license":"MIT","devDependencies":{"electron":"^40.6.0","electron-builder":"^26.8.0"},"build":{"appId":"com.kiosk.app","productName":"Kiosk App","directories":{"output":"dist"},"files":["main.js","preload.js","index.html","renderer.js","unlock.html","unlock-preload.js","js/**/*","config.json"],"win":{"target":[{"target":"portable","arch":["x64"]}]},"portable":{"artifactName":"${productName}-${version}-portable.${ext}"}}}
+{
+    "name": "kiosk-app",
+    "version": "1.0.0",
+    "description": "Electron kiosk application with portable Windows build",
+    "main": "main.js",
+    "scripts": {
+        "start": "electron .",
+        "build": "electron-builder",
+        "build:win": "electron-builder --win portable",
+        "build:win:dir": "electron-builder --win portable --dir"
+    },
+    "author": "",
+    "license": "MIT",
+    "devDependencies": {
+        "electron": "^40.6.0",
+        "electron-builder": "^26.8.0"
+    },
+    "build": {
+        "appId": "com.kiosk.app",
+        "productName": "Kiosk App",
+        "directories": {
+            "output": "dist"
+        },
+        "files": [
+            "main.js",
+            "preload.js",
+            "index.html",
+            "renderer.js",
+            "unlock.html",
+            "unlock-preload.js",
+            "js/**/*",
+            "config.json"
+        ],
+        "win": {
+            "target": [
+                {
+                    "target": "portable",
+                    "arch": [
+                        "x64"
+                    ]
+                }
+            ]
+        },
+        "portable": {
+            "artifactName": "${productName}-${version}-portable.${ext}"
+        }
+    }
+}
