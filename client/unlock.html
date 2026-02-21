@@ -1,0 +1,87 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Разблокировка</title>
+  <style>
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      font-family: system-ui, sans-serif;
+      background: #1a1a2e;
+      color: #e0e0e0;
+      padding: 24px;
+      min-width: 320px;
+    }
+    h2 { margin: 0 0 16px; font-size: 1.1rem; }
+    input {
+      width: 100%;
+      padding: 10px 12px;
+      margin-bottom: 12px;
+      border: 1px solid #3d3d5c;
+      border-radius: 8px;
+      background: #252540;
+      color: #fff;
+      font-size: 1rem;
+    }
+    input:focus { outline: none; border-color: #6366f1; }
+    button {
+      width: 100%;
+      padding: 10px;
+      border: none;
+      border-radius: 8px;
+      background: #6366f1;
+      color: #fff;
+      font-size: 1rem;
+      cursor: pointer;
+    }
+    button:hover { background: #5558e3; }
+    .error { color: #f87171; font-size: 0.875rem; margin-top: 8px; }
+  </style>
+</head>
+<body>
+  <h2>Введите пароль для разблокировки</h2>
+  <input type="password" id="password" placeholder="Пароль" autofocus>
+  <button type="button" id="submit">Разблокировать</button>
+  <p id="error" class="error" style="display: none;"></p>
+  <script>
+    const input = document.getElementById('password');
+    const submit = document.getElementById('submit');
+    const errorEl = document.getElementById('error');
+
+    function showError(msg) {
+      errorEl.textContent = msg;
+      errorEl.style.display = 'block';
+    }
+
+    function hideError() {
+      errorEl.style.display = 'none';
+    }
+
+    submit.addEventListener('click', () => {
+      hideError();
+      const pwd = input.value.trim();
+      if (!pwd) {
+        showError('Введите пароль');
+        return;
+      }
+      window.unlockAPI.sendPassword(pwd);
+    });
+
+    input.addEventListener('keydown', (e) => {
+      if (e.key === 'Enter') submit.click();
+    });
+
+    window.unlockAPI.onUnlockResult((result) => {
+      if (result.success) {
+        window.close();
+      } else {
+        showError(result.error || 'Неверный пароль');
+        input.value = '';
+        input.focus();
+      }
+    });
+  </script>
+</body>
+</html>

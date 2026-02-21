@@ -1,0 +1,32 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta http-equiv="Content-Security-Policy" content="default-src 'self' https: http: data: blob:; script-src 'self' 'unsafe-inline'; media-src * blob:; connect-src 'self' ws: wss:;">
+  <title>Kiosk Client</title>
+  <style>
+    * { box-sizing: border-box; }
+    body { margin: 0; font-family: system-ui, sans-serif; background: #0f0f1a; color: #e0e0e0; min-height: 100vh; overflow: hidden; }
+    #waiting { display: flex; flex-direction: column; align-items: center; justify-content: center; min-height: 100vh; padding: 2rem; text-align: center; }
+    #waiting.hidden { display: none; }
+    #browser-container { display: none; width: 100vw; height: 100vh; position: relative; }
+    #browser-container.visible { display: block; }
+    #browser-container webview { width: 100%; height: 100%; }
+    .status { font-size: 0.9rem; opacity: 0.8; margin-top: 1rem; }
+    .status.connected { color: #4ade80; }
+    .status.disconnected { color: #f87171; }
+  </style>
+</head>
+<body>
+  <div id="waiting">
+    <h1>Kiosk Client</h1>
+    <p>Ожидание команд от монитора...</p>
+    <p id="status" class="status disconnected">Подключение…</p>
+  </div>
+  <div id="browser-container">
+    <webview id="webview" allowpopups="no"></webview>
+  </div>
+  <script type="module" src="renderer.js"></script>
+</body>
+</html>

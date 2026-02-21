@@ -1,0 +1,7 @@
+{
+  "backendWsUrl": "ws://localhost:8000/ws/client",
+  "authToken": "your-secret-token",
+  "groupId": "",
+  "unlockPassword": "admin",
+  "unlockShortcut": "CommandOrControl+Alt+L"
+}
