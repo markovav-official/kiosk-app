@@ -77,6 +77,7 @@ function createWindow() {
     frame: false,
     alwaysOnTop: true,
     skipTaskbar: true,
+    fullscreenable: true,
     webPreferences: {
       preload: path.join(__dirname, 'preload.js'),
       contextIsolation: true,
@@ -86,6 +87,9 @@ function createWindow() {
   });
 
   mainWindow.setMenuBarVisibility(false);
+  // Поверх всех окон и панели (Win/macOS/Linux), на всех рабочих столах
+  mainWindow.setAlwaysOnTop(true, 'screen-saver');
+  mainWindow.setVisibleOnAllWorkspaces(true);
   const indexPath = fs.existsSync(path.join(__dirname, 'dist', 'index.html'))
     ? path.join(__dirname, 'dist', 'index.html')
     : path.join(__dirname, 'index.html');
@@ -95,15 +99,26 @@ function createWindow() {
     mainWindow.webContents.send('config', config);
   });
 
-  // Блокировка F11 и выхода из полноэкранного режима без разблокировки
+  // Блокировка F11, Alt, Super/Meta (Win/клавиша Apple) без разблокировки
   mainWindow.webContents.on('before-input-event', (event, input) => {
-    if (isLocked && input.key === 'F11') {
+    if (!isLocked) return;
+    if (input.key === 'F11') {
+      event.preventDefault();
+      return;
+    }
+    if (input.key === 'Alt' || input.key === 'Meta' || input.key === 'Super') {
       event.preventDefault();
     }
   });
   mainWindow.on('leave-full-screen', () => {
     if (isLocked && mainWindow && !mainWindow.isDestroyed()) {
       mainWindow.setFullScreen(true);
+    }
+  });
+  // При потере фокуса (клик по панели/другому окну) сразу возвращаем фокус в киоск
+  mainWindow.on('blur', () => {
+    if (isLocked && mainWindow && !mainWindow.isDestroyed() && !unlockWindow) {
+      mainWindow.focus();
     }
   });
 
@@ -148,7 +163,7 @@ function lockMainWindow() {
   isLocked = true;
   mainWindow.setKiosk(true);
   mainWindow.setFullScreen(true);
-  mainWindow.setAlwaysOnTop(true);
+  mainWindow.setAlwaysOnTop(true, 'screen-saver');
 }
 
 function unlockMainWindow() {

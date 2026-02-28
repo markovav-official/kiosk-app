@@ -1,0 +1,39 @@
+# systemd unit для Kiosk Launcher
+# Запуск при загрузке системы, автоперезапуск при падении.
+#
+# Установка (от root или через sudo):
+#   cp kiosk-launcher.service /etc/systemd/system/
+#   # Отредактируйте Environment и пути в [Service] при необходимости
+#   systemctl daemon-reload
+#   systemctl enable kiosk-launcher
+#   systemctl start kiosk-launcher
+#
+# Управление:
+#   systemctl status kiosk-launcher
+#   systemctl stop kiosk-launcher
+#   journalctl -u kiosk-launcher -f
+
+[Unit]
+Description=Kiosk Launcher (Wi-Fi + app watchdog)
+After=network.target NetworkManager.service
+Wants=network-online.target
+
+[Service]
+Type=simple
+# Путь к скрипту и рабочая директория (где лежит приложение)
+WorkingDirectory=/opt/kiosk-app/client
+ExecStart=/opt/kiosk-app/client/kiosk-launcher.sh
+# Переменные окружения (подставьте свои SSID и пароль)
+Environment="WIFI_SSID=MyKioskNetwork"
+Environment="WIFI_PASSWORD=your_password"
+Environment="LAUNCH_MODE=appimage"
+Environment="LOG_FILE=/var/log/kiosk-launcher.log"
+# Автоперезапуск при падении (в т.ч. при ошибке в скрипте)
+Restart=always
+RestartSec=10
+# От какого пользователя запускать (киоск обычно один пользователь)
+User=pi
+Group=pi
+
+[Install]
+WantedBy=multi-user.target
