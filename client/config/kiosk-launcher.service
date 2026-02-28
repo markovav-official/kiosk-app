@@ -21,19 +21,14 @@ Wants=network-online.target
 [Service]
 Type=simple
 # Путь к скрипту и рабочая директория (где лежит приложение)
-WorkingDirectory=/opt/kiosk-app/client
-ExecStart=/opt/kiosk-app/client/kiosk-launcher.sh
-# Переменные окружения (подставьте свои SSID и пароль)
-Environment="WIFI_SSID=MyKioskNetwork"
-Environment="WIFI_PASSWORD=your_password"
-Environment="LAUNCH_MODE=appimage"
-Environment="LOG_FILE=/var/log/kiosk-launcher.log"
+WorkingDirectory=/home/live/kiosk-app
+ExecStart=/home/live/kiosk-app/kiosk-launcher.sh
 # Автоперезапуск при падении (в т.ч. при ошибке в скрипте)
 Restart=always
 RestartSec=10
 # От какого пользователя запускать (киоск обычно один пользователь)
-User=pi
-Group=pi
+User=live
+Group=live
 
 [Install]
 WantedBy=multi-user.target

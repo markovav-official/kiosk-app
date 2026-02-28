@@ -9,9 +9,10 @@
     "start": "npm run build && electron .",
     "start:dev": "vite build --watch & electron .",
     "build:win": "npm run build && electron-builder --win portable",
-    "build:linux": "npm run build && electron-builder --linux AppImage"
+    "build:linux": "npm run build && electron-builder --linux deb"
   },
-  "author": "",
+  "author": "Andrei Markov <a.markov@innopolis.university>",
+  "homepage": "https://innopolis.university",
   "license": "MIT",
   "dependencies": {
     "react": "^19.2.0",

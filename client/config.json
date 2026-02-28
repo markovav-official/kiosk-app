@@ -1,5 +1,5 @@
 {
-  "backendWsUrl": "ws://localhost:8000/ws/client",
+  "backendWsUrl": "ws://192.168.1.136:8000/ws/client",
   "authToken": "your-secret-token",
   "groupId": "",
   "unlockPassword": "admin",
