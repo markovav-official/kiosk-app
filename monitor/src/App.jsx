@@ -72,6 +72,10 @@ function App() {
     }
   }, [connectionFailed, authToken])
 
+  useEffect(() => {
+    if (connected) refresh()
+  }, [connected, refresh])
+
   if (!authToken) {
     return (
       <AuthScreen
@@ -99,10 +103,6 @@ function App() {
     clearAuthToken()
     setAuthToken('')
   }
-
-  useEffect(() => {
-    if (connected) refresh()
-  }, [connected, refresh])
 
   const filteredClients = selectedGroupId
     ? clients.filter((c) => {
