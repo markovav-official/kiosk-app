@@ -12,9 +12,9 @@ class Settings(BaseSettings):
     host: str = "0.0.0.0"
     port: int = 8000
     # WebSocket URL path for clients (kiosk devices)
-    ws_client_path: str = "/ws/client"
+    ws_client_path: str = "/kiosk-api/ws/client"
     # WebSocket URL path for monitor dashboard
-    ws_monitor_path: str = "/ws/monitor"
+    ws_monitor_path: str = "/kiosk-api/ws/monitor"
 
     class Config:
         env_file = ".env"

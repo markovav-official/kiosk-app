@@ -25,7 +25,7 @@ uvicorn app.main:app --reload --host 0.0.0.0 --port 8000
 ```bash
 cd monitor
 cp .env.example .env
-# В .env: VITE_AUTH_TOKEN=тот-же-токен, VITE_API_URL=http://localhost:8000, VITE_WS_URL=ws://localhost:8000/ws/monitor
+# В .env: VITE_AUTH_TOKEN=тот-же-токен, VITE_API_URL=http://localhost:8000, VITE_WS_URL=ws://localhost:8000/kiosk-api/ws/monitor
 npm install
 npm run dev
 ```
@@ -36,7 +36,7 @@ npm run dev
 
 ```bash
 cd client
-# Скопируйте config.example.json в config.json и укажите backendWsUrl (ws://IP:8000/ws/client) и authToken
+# Скопируйте config.example.json в config.json и укажите backendWsUrl (ws://IP:8000/kiosk-api/ws/client) и authToken
 npm install
 npm start
 ```
@@ -64,10 +64,10 @@ docker compose up -d
 - Бэкенд: http://localhost:8000  
 - Монитор: http://localhost:3000  
 
-Переменные для монитора (VITE_*) задаются на этапе сборки. По умолчанию в образе подставлены `http://localhost:8000` и `ws://localhost:8000/ws/monitor`. Чтобы подставить свои URL при сборке:
+Переменные для монитора (VITE_*) задаются на этапе сборки. По умолчанию в образе подставлены `http://localhost:8000` и `ws://localhost:8000/kiosk-api/ws/monitor`. Чтобы подставить свои URL при сборке:
 
 ```bash
-docker compose build monitor --build-arg VITE_API_URL=http://your-backend:8000 --build-arg VITE_WS_URL=ws://your-backend:8000/ws/monitor --build-arg VITE_AUTH_TOKEN=your-token
+docker compose build monitor --build-arg VITE_API_URL=http://your-backend:8000 --build-arg VITE_WS_URL=ws://your-backend:8000/kiosk-api/ws/monitor --build-arg VITE_AUTH_TOKEN=your-token
 ```
 
 ## Авторизация
@@ -82,7 +82,7 @@ docker compose build monitor --build-arg VITE_API_URL=http://your-backend:8000 -
 
 ## Группы
 
-Клиент может указать `group_id` в конфиге при подключении. В мониторе можно выбрать группу и выполнять действия сразу для всех устройств в группе (открыть URL, закрыть сайт, закрыть клиент, выключить ПК). Группы создаются при первом подключении клиента с данным `group_id` или через API `POST /api/groups`.
+Клиент может указать `group_id` в конфиге при подключении. В мониторе можно выбрать группу и выполнять действия сразу для всех устройств в группе (открыть URL, закрыть сайт, закрыть клиент, выключить ПК). Группы создаются при первом подключении клиента с данным `group_id` или через API `POST /kiosk-api/groups`.
 
 ## NixOS (киоск) — развёртывание одним файлом без клона репозитория
 

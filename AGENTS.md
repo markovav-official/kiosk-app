@@ -40,7 +40,7 @@ kiosk-app/
 │
 ├── backend/                # FastAPI
 │   ├── app/
-│   │   ├── main.py         # FastAPI app, CORS, /health, WebSocket /ws/client, /ws/monitor
+│   │   ├── main.py         # FastAPI app, CORS, /health, WebSocket /kiosk-api/ws/client, /kiosk-api/ws/monitor
 │   │   ├── config.py       # Settings из .env (AUTH_TOKEN, PORT, WS paths)
 │   │   ├── auth.py         # Проверка токена (WS query, REST X-Token)
 │   │   ├── models/schemas.py    # ClientRegister, ClientInfo, ClientMediaFrame, OpenUrlBody и т.д.
@@ -51,9 +51,9 @@ kiosk-app/
 │   │   │   ├── manager.py  # ConnectionManager: клиенты + мониторы, send_to_client, broadcast_to_monitors
 │   │   │   └── handlers.py # handle_client_message: register, media, current_url, pong
 │   │   ├── routers/
-│   │   │   ├── clients.py  # GET /api/clients, GET /api/groups, PATCH /api/clients/:id (group_id, display_name)
+│   │   │   ├── clients.py  # GET /kiosk-api/clients, GET /kiosk-api/groups, PATCH /kiosk-api/clients/:id (group_id, display_name)
 │   │   │   ├── commands.py # POST .../open_url, close_site, close_app, shutdown (клиент + группа)
-│   │   │   ├── groups.py   # POST /api/groups (создать группу)
+│   │   │   ├── groups.py   # POST /kiosk-api/groups (создать группу)
 │   │   │   └── schema_*.py # Тела запросов
 │   │   └── services/connection_manager.py  # get_manager() — синглтон ConnectionManager
 │   ├── requirements.txt
@@ -98,7 +98,7 @@ kiosk-app/
 
 - **Авторизация:** один токен для всех. Backend: `AUTH_TOKEN` в `.env`. Monitor: `VITE_AUTH_TOKEN`. Client: `authToken` в `config.json`. WS: `?token=...`, REST: заголовок `X-Token`. Пустой `AUTH_TOKEN` отключает проверку.
 - **Идентификация клиента:** постоянный `device_id` (UUID в `userData/device_id.json`). При реконнекте бэкенд находит того же клиента по `device_id` и не создаёт дубликат.
-- **Отображение имени:** в мониторе показывается `display_name` (если задан с монитора) или `hostname`. Меняется через PATCH `/api/clients/:id` и меню «Имя / группа» на карточке.
+- **Отображение имени:** в мониторе показывается `display_name` (если задан с монитора) или `hostname`. Меняется через PATCH `/kiosk-api/clients/:id` и меню «Имя / группа» на карточке.
 
 ---
 
@@ -125,7 +125,7 @@ kiosk-app/
 
 Три части:
 - client/ — Electron + React + Vite + Tailwind, kiosk, WebSocket к бэкенду, передаёт экран/камеру/звук, выполняет команды (open_url, close_site, close_app, shutdown). Конфиг: config.json. Запуск: npm run build && electron . или npm start. Разблокировка: CommandOrControl+Alt+L + пароль в config.
-- backend/ — FastAPI, WebSocket /ws/client и /ws/monitor, REST /api/clients, /api/groups, команды по клиенту и группе. Токен в .env AUTH_TOKEN. Клиенты с постоянным device_id, реконнект без дубликатов.
+- backend/ — FastAPI, WebSocket /kiosk-api/ws/client и /kiosk-api/ws/monitor, REST /kiosk-api/clients, /kiosk-api/groups, команды по клиенту и группе. Токен в .env AUTH_TOKEN. Клиенты с постоянным device_id, реконнект без дубликатов.
 - monitor/ — React+Vite+Tailwind, дашборд устройств и групп, меню ⋯ на карточке (URL, имя/группа, команды), полноэкранный вид устройства, создание групп в сайдбаре.
 
 Запуск: backend — uvicorn app.main:app; monitor — npm run dev; client — npm start. Docker: docker compose up. Portable Win: client npm run build:win.

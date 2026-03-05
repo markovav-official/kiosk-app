@@ -5,7 +5,7 @@ from app.auth import get_token_header
 from app.services.connection_manager import get_manager
 from app.routers.schema_commands import OpenUrlBody
 
-router = APIRouter(prefix="/api", tags=["commands"])
+router = APIRouter(prefix="/kiosk-api", tags=["commands"])
 
 
 @router.post("/clients/{client_id}/open_url")

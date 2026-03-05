@@ -13,7 +13,7 @@ function loadConfig() {
     console.error('Config load error:', e);
   }
   return {
-    backendWsUrl: process.env.BACKEND_WS_URL || data.backendWsUrl || 'ws://localhost:8000/ws/client',
+    backendWsUrl: process.env.BACKEND_WS_URL || data.backendWsUrl || 'ws://localhost:8000/kiosk-api/ws/client',
     authToken: process.env.AUTH_TOKEN || data.authToken || '',
     groupId: process.env.GROUP_ID || data.groupId || '',
     unlockPassword: process.env.UNLOCK_PASSWORD || data.unlockPassword || '',

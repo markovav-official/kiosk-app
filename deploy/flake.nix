@@ -34,7 +34,7 @@
           kiosk.package = kioskFlake.packages.${pkgs.system}.default;
           kiosk.user = "kiosk";
 
-          kiosk.backendWsUrl = "ws://192.168.1.100:8000/ws/client";
+          kiosk.backendWsUrl = "ws://192.168.1.100:8000/kiosk-api/ws/client";
           kiosk.authToken = "your-secret-token";
           kiosk.groupId = "";
           kiosk.unlockPassword = "admin";

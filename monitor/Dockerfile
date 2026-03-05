@@ -2,7 +2,7 @@ FROM node:20-alpine AS builder
 
 WORKDIR /app
 ARG VITE_API_URL=http://localhost:8000
-ARG VITE_WS_URL=ws://localhost:8000/ws/monitor
+ARG VITE_WS_URL=ws://localhost:8000/kiosk-api/ws/monitor
 ARG VITE_AUTH_TOKEN=
 ENV VITE_API_URL=$VITE_API_URL VITE_WS_URL=$VITE_WS_URL VITE_AUTH_TOKEN=$VITE_AUTH_TOKEN
 COPY package*.json ./

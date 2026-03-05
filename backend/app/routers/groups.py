@@ -5,7 +5,7 @@ from app.auth import get_token_header
 from app.services.connection_manager import get_manager
 from pydantic import BaseModel
 
-router = APIRouter(prefix="/api", tags=["groups"])
+router = APIRouter(prefix="/kiosk-api", tags=["groups"])
 
 
 class GroupCreate(BaseModel):

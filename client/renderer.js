@@ -71,7 +71,7 @@ function onShutdown() {
 
 function initWs() {
   if (!config) return;
-  const url = config.backendWsUrl || 'ws://localhost:8000/ws/client';
+  const url = config.backendWsUrl || 'ws://localhost:8000/kiosk-api/ws/client';
   const token = config.authToken || '';
 
   wsClient = createWsClient({

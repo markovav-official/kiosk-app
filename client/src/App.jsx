@@ -64,7 +64,7 @@ function App() {
 
   useEffect(() => {
     if (!config) return;
-    const url = config.backendWsUrl || 'ws://localhost:8000/ws/client';
+    const url = config.backendWsUrl || 'ws://localhost:8000/kiosk-api/ws/client';
     const token = config.authToken || '';
 
     const client = createWsClient({

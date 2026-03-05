@@ -5,7 +5,7 @@ from app.auth import get_token_header
 from app.services.connection_manager import get_manager
 from app.routers.schema_clients import ClientUpdateBody
 
-router = APIRouter(prefix="/api", tags=["clients"])
+router = APIRouter(prefix="/kiosk-api", tags=["clients"])
 
 
 @router.get("/clients")
