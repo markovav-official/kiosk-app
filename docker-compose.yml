@@ -23,7 +23,7 @@ services:
         aliases:
           - kiosk-monitor
     depends_on:
-      - backend
+      - kiosk-backend
 
 networks:
   applyz-network:
