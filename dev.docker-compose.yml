@@ -5,7 +5,6 @@ services:
       - "8000:8000"
     env_file: ./backend/.env
     environment:
-      - AUTH_TOKEN=${AUTH_TOKEN:-your-secret-token}
       - HOST=0.0.0.0
       - PORT=8000
 

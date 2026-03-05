@@ -3,7 +3,6 @@ services:
     build: ./backend
     env_file: ./backend/.env
     environment:
-      - AUTH_TOKEN=${AUTH_TOKEN:-your-secret-token}
       - HOST=0.0.0.0
       - PORT=8000
     networks:
