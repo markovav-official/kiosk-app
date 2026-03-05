@@ -56,10 +56,9 @@ function App() {
 
   useEffect(() => {
     const api = window.electronAPI;
-    if (!api?.onConfig) return;
-    api.onConfig((cfg) => {
-      setConfig(cfg);
-    });
+    if (!api) return;
+    api.onConfig((cfg) => setConfig(cfg));
+    api.getConfig?.().then((cfg) => cfg != null && setConfig(cfg));
   }, []);
 
   useEffect(() => {

@@ -196,6 +196,8 @@ function registerUnlockShortcut(config) {
   });
 }
 
+ipcMain.handle('get-config', () => loadConfig());
+
 ipcMain.on('quit-app', () => {
   allowClose = true;
   app.quit();
