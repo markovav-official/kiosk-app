@@ -66,6 +66,18 @@ let isLocked = true;
 /** Only when true will app/window close (e.g. after "quit" from monitor). */
 let allowClose = false;
 
+// Запуск только одного экземпляра приложения
+if (!app.requestSingleInstanceLock()) {
+  app.quit();
+  return;
+}
+app.on('second-instance', () => {
+  if (mainWindow && !mainWindow.isDestroyed()) {
+    if (mainWindow.isMinimized()) mainWindow.restore();
+    mainWindow.focus();
+  }
+});
+
 function createWindow() {
   const config = loadConfig();
 
